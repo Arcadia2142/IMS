@@ -102,14 +102,16 @@ const TEdgeVector &Place::getEdges( Edge::Direct direct ){
  * @param event
  * @param count
  */
-void Place::blockCapacity( CalendarEvent * event, TCapacity count ){
-    CalendarEvent *empty = NULL;
-    TCapacityFront::iterator i = std::find( this->capacityFront.begin(), this->capacityFront.end(), empty );
-    
+void Place::blockCapacity( CalendarEvent * event, TCapacity count ){    
     TCapacity counter = 0;
+    TCapacityFront::iterator i = this->capacityFront.begin();
+    
     while( i != this->capacityFront.end() && counter < count ){
-        *i = event;
-        counter++;
+        if((CalendarEvent *)*i == NULL){
+            *i = event;
+            counter++;
+        }
+        
         i++;
     }
 }
@@ -123,9 +125,13 @@ void Place::releaseCapacity( TCapacity capacity, Calendar *calendar ){
         //Na kapacitě je nastavena událost... zrušíme jí.
         if( event != NULL ){
             calendar->removeEvent(event);
-            TCapacityFront::iterator ii = std::find( this->capacityFront.begin(), this->capacityFront.end(), event );
-            for( ; ii != this->capacityFront.end(); ii++ ){
-                *ii = NULL;
+            TCapacityFront::iterator ii = this->capacityFront.begin();
+            while( ii != this->capacityFront.end() ){
+                if( ((CalendarEvent *)*ii) == event ){
+                    *ii = NULL;
+                }
+                
+                ii++;
             }
         }
         
@@ -139,8 +145,13 @@ void Place::releaseCapacity( TCapacity capacity, Calendar *calendar ){
  * @param event
  */
 void Place::releaseCapacity( CalendarEvent *event ){
-    TCapacityFront::iterator i = std::find( this->capacityFront.begin(), this->capacityFront.end(), event );
-    while( i != this->capacityFront.end() ){
-        this->capacityFront.erase(i);
+    TCapacityFront::iterator ii = this->capacityFront.begin();
+    while( ii != this->capacityFront.end() ){
+        if( ((CalendarEvent *)*ii) == event ){
+            ii = this->capacityFront.erase(ii);
+            continue;
+        }
+        
+        ii++;
     }
 }

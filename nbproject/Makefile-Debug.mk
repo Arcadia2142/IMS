@@ -40,8 +40,10 @@ OBJECTFILES= \
 	${OBJECTDIR}/Edge.o \
 	${OBJECTDIR}/GeneratorEvent.o \
 	${OBJECTDIR}/Identificator.o \
+	${OBJECTDIR}/LamdaEvent.o \
 	${OBJECTDIR}/Place.o \
 	${OBJECTDIR}/Simulator.o \
+	${OBJECTDIR}/StatisticPrinter.o \
 	${OBJECTDIR}/Transition.o \
 	${OBJECTDIR}/main.o
 
@@ -95,6 +97,11 @@ ${OBJECTDIR}/Identificator.o: Identificator.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Identificator.o Identificator.cpp
 
+${OBJECTDIR}/LamdaEvent.o: LamdaEvent.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/LamdaEvent.o LamdaEvent.cpp
+
 ${OBJECTDIR}/Place.o: Place.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -104,6 +111,11 @@ ${OBJECTDIR}/Simulator.o: Simulator.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Simulator.o Simulator.cpp
+
+${OBJECTDIR}/StatisticPrinter.o: StatisticPrinter.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/StatisticPrinter.o StatisticPrinter.cpp
 
 ${OBJECTDIR}/Transition.o: Transition.cpp 
 	${MKDIR} -p ${OBJECTDIR}

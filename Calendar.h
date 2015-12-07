@@ -48,7 +48,7 @@ class Calendar {
         /** Vypočítání času pro zadaný třechod.*/
         static double calcTime( Transition *transition );
     private:
-        TTime currentTime = 0;
+        TTime currentTime = 0.0;
         
         TCalendar calendar;
         TEventMap eventMap;

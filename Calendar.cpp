@@ -9,8 +9,10 @@
 #include "CalendarEvent.h"
 #include "Transition.h"
 #include "Types.h"
+#include <random>
 #include <algorithm>
 #include <map>
+#include <iostream>
 
 Calendar::Calendar() {
     
@@ -61,7 +63,9 @@ void Calendar::addEvent( CalendarEvent *event, TTime timeOffset ){
     this->calendar.push_back(calendarItem);
     
     //Seřadíme kalendář.
-    std::stable_sort( this->calendar.begin(), this->calendar.end() );
+    std::sort( this->calendar.begin(), this->calendar.end(), [](TCalendarItem *item1, TCalendarItem *item2){
+        return (item1->first) < (item2->first);
+    });
 }
         
 /**
@@ -73,6 +77,7 @@ TPlaceVector *Calendar::runEvent( TTime maxTime ){
     
     if( this->calendar.size() > 0 ){
         TCalendarItem *item = *(this->calendar.begin());
+         
         if( item->first <= maxTime ){
             this->currentTime = item->first;
             
@@ -143,7 +148,10 @@ double Calendar::getExp( double exp ){
  * @return 
  */
 double Calendar::getNorm(){
-    return 1*(rand()/(RAND_MAX+1.0));
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    return dist(mt);
 }
 
 /**

@@ -12,6 +12,8 @@
 #include "Calendar.h"
 #include "Transition.h"
 #include "Place.h"
+#include "CalendarEvent.h"
+#include "StatisticPrinter.h"
 
 /**
  * Hlavní třída simulátoru.
@@ -26,8 +28,8 @@ class Simulator {
         
         //Vytvoření přechodu.
         Transition *createTransition( double chance );
-        Transition *createTransition( TTimeTypes timeType, TTime time, TPriority priority = 1 );
-        Transition *createTransition( TPriority priority = 1 );
+        Transition *createTransition( TTimeTypes timeType, TTime time, TPriority priority = 0 );
+        Transition *createTransition( TPriority priority = 0 );
         
         //Vytvoření hrany.
         Edge *createEdge( Place *place, Transition *transition, TCapacity capacity = 1 );
@@ -37,20 +39,32 @@ class Simulator {
         void run( TTime maxTime = DEFAULT_MAX_SIMULATION_TIME );
         
         //Zobrazení statistik.
-        void printStatistics();
+        void printStatistics( int types = StatisticPrinter::All );
         
     protected:
         //Přpravení modelu ke spuštění.
         void prepareModel();
         
-        /** Simulace přechodu z tohoto místa. */
-        bool simPlace( Place *place );
+        /** Zjištění jestly je přechod proveditelný */
+        bool simTransition( Transition *transition, bool calcWithBlock = false );
+        
+        /** Zjištění jestly se jedná o přechody závyslé na šanci  */
+        bool isChanceTransitions( const TEdgeVector &edges );
         
         /** Spuštění simulace na zadaná místa. */
-        bool simPlaces( TPlaceVector *places );
+        bool runPlaces( TPlaceVector *places );
         
-        /** Spuštění simulace přechodu. */
-        bool simTransition( Transition *transition );
+         /** Simulace přechodu z tohoto místa. */
+        bool runPlace( Place *place );
+        
+        /** Spuštění přechodu. */
+        bool runTransition( Transition *transition );
+        
+        /** Provedení přechodu. */
+        TPlaceVector *transferTransition( Transition *transition, CalendarEvent *event = NULL );
+        
+        /** Zablokování kapacity */
+        void blockCapacity( Transition *transition, CalendarEvent *event );
         
         //Pomocná metoda pro ukládání přechodů.
         Transition *storeTransition( Transition * transition);
@@ -60,6 +74,7 @@ class Simulator {
             
     private:
         Calendar calendar;
+        StatisticPrinter *statistics;
         
         //Uložiště všechy vytvořených objektů.
         TTransitionVector transitions;

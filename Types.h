@@ -19,9 +19,11 @@
 class Identificator;
 class Calendar;
 class CalendarEvent;
+class LamdaEvent;
 class Simulator;
 class Place;
 class Transition;
+class StatisticPrinter;
 class Edge;
 
 /** Kapacita místa/hrany */

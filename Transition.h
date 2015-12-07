@@ -46,8 +46,8 @@ class Transition: public Identificator{
         
     private:
         Transition( double chance );
-        Transition( TTimeTypes timeType, TTime time, TPriority priority = 1 );
-        Transition( TPriority priority = 1 );
+        Transition( TTimeTypes timeType, TTime time, TPriority priority = 0 );
+        Transition( TPriority priority = 0 );
         
     private:
         /** Priorita přechodu. */
