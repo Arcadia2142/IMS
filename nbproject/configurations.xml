@@ -7,11 +7,10 @@
       <itemPath>Calendar.h</itemPath>
       <itemPath>CalendarEvent.h</itemPath>
       <itemPath>Edge.h</itemPath>
+      <itemPath>GeneratorEvent.h</itemPath>
       <itemPath>Identificator.h</itemPath>
       <itemPath>Place.h</itemPath>
       <itemPath>Simulator.h</itemPath>
-      <itemPath>Transaction.h</itemPath>
-      <itemPath>TransactionProvider.h</itemPath>
       <itemPath>Transition.h</itemPath>
       <itemPath>Types.h</itemPath>
     </logicalFolder>
@@ -25,11 +24,10 @@
       <itemPath>Calendar.cpp</itemPath>
       <itemPath>CalendarEvent.cpp</itemPath>
       <itemPath>Edge.cpp</itemPath>
+      <itemPath>GeneratorEvent.cpp</itemPath>
       <itemPath>Identificator.cpp</itemPath>
       <itemPath>Place.cpp</itemPath>
       <itemPath>Simulator.cpp</itemPath>
-      <itemPath>Transaction.cpp</itemPath>
-      <itemPath>TransactionProvider.cpp</itemPath>
       <itemPath>Transition.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
@@ -70,6 +68,10 @@
       </item>
       <item path="Edge.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="GeneratorEvent.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="GeneratorEvent.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="Identificator.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Identificator.h" ex="false" tool="3" flavor2="0">
@@ -81,14 +83,6 @@
       <item path="Simulator.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Simulator.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Transaction.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="Transaction.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="TransactionProvider.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="TransactionProvider.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Transition.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -132,6 +126,10 @@
       </item>
       <item path="Edge.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="GeneratorEvent.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="GeneratorEvent.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="Identificator.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Identificator.h" ex="false" tool="3" flavor2="0">
@@ -143,14 +141,6 @@
       <item path="Simulator.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="Simulator.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Transaction.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="Transaction.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="TransactionProvider.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="TransactionProvider.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Transition.cpp" ex="false" tool="1" flavor2="0">
       </item>

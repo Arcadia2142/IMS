@@ -38,11 +38,10 @@ OBJECTFILES= \
 	${OBJECTDIR}/Calendar.o \
 	${OBJECTDIR}/CalendarEvent.o \
 	${OBJECTDIR}/Edge.o \
+	${OBJECTDIR}/GeneratorEvent.o \
 	${OBJECTDIR}/Identificator.o \
 	${OBJECTDIR}/Place.o \
 	${OBJECTDIR}/Simulator.o \
-	${OBJECTDIR}/Transaction.o \
-	${OBJECTDIR}/TransactionProvider.o \
 	${OBJECTDIR}/Transition.o \
 	${OBJECTDIR}/main.o
 
@@ -86,6 +85,11 @@ ${OBJECTDIR}/Edge.o: Edge.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Edge.o Edge.cpp
 
+${OBJECTDIR}/GeneratorEvent.o: GeneratorEvent.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GeneratorEvent.o GeneratorEvent.cpp
+
 ${OBJECTDIR}/Identificator.o: Identificator.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -100,16 +104,6 @@ ${OBJECTDIR}/Simulator.o: Simulator.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Simulator.o Simulator.cpp
-
-${OBJECTDIR}/Transaction.o: Transaction.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Transaction.o Transaction.cpp
-
-${OBJECTDIR}/TransactionProvider.o: TransactionProvider.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TransactionProvider.o TransactionProvider.cpp
 
 ${OBJECTDIR}/Transition.o: Transition.cpp 
 	${MKDIR} -p ${OBJECTDIR}

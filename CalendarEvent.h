@@ -16,18 +16,15 @@
  */
 class CalendarEvent {
     public:
-        CalendarEvent( Calendar *calendar, TransactionProvider *transactionProvider );
+        CalendarEvent( Calendar *calendar );
 
         virtual ~CalendarEvent();
         
         /** Spuštění události. */
-        virtual void run() = 0;
+        virtual TPlaceVector *run() = 0;
     protected:
         /** Objekt kalendáře. */
         Calendar * const calendar;
-        
-        /** Provider na vytváření transakcí. */
-        TransactionProvider *const transactionProvider;
 };
 
 #endif /* CALENDAREVENT_H */

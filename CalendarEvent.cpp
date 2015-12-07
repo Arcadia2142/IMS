@@ -11,9 +11,8 @@
  * Vytvoření události v kalendáři.
  * @param calendar
  */
-CalendarEvent::CalendarEvent( Calendar *calendar, TransactionProvider *transactionProvider ): 
-    calendar(calendar),
-    transactionProvider(transactionProvider)
+CalendarEvent::CalendarEvent( Calendar *calendar ): 
+    calendar(calendar)
 {
     
 }

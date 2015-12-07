@@ -7,7 +7,10 @@
 
 #include "Calendar.h"
 #include "CalendarEvent.h"
+#include "Transition.h"
+#include "Types.h"
 #include <algorithm>
+#include <map>
 
 Calendar::Calendar() {
     
@@ -20,8 +23,12 @@ Calendar::~Calendar() {
         TCalendarItem *item = *i;
         delete item->second;
         delete item;
-        
         this->calendar.erase(i);
+    }
+    
+    //Smazání událostí
+    for( TEventMap::iterator i = this->eventMap.begin(); i != this->eventMap.end(); i++ ){
+        delete i->first;
     }
 }
 
@@ -50,6 +57,7 @@ void Calendar::addEvent( CalendarEvent *event, TTime timeOffset ){
     calendarItem->first = time;
     calendarItem->second = eventVector;
     
+    this->eventMap.insert( std::make_pair(event, time) );
     this->calendar.push_back(calendarItem);
     
     //Seřadíme kalendář.
@@ -58,18 +66,23 @@ void Calendar::addEvent( CalendarEvent *event, TTime timeOffset ){
         
 /**
  * Spuštění nejbližší události.
- * @return 
+ * @return TPlaceVector *|null
  */
-bool Calendar::runEvent( TTime maxTime ){
+TPlaceVector *Calendar::runEvent( TTime maxTime ){
+    TPlaceVector *changedPlaces = NULL;
+    
     if( this->calendar.size() > 0 ){
         TCalendarItem *item = *(this->calendar.begin());
         if( item->first <= maxTime ){
+            this->currentTime = item->first;
+            
             //Spuětění události.
             TEventVector * events = item->second;
             CalendarEvent *event = *(events->begin());
-            event->run();
+            changedPlaces = event->run();
             
             //Smazání události.
+            this->eventMap.erase(event);
             delete event;
             events->erase(events->begin());
             
@@ -78,12 +91,34 @@ bool Calendar::runEvent( TTime maxTime ){
                 delete events;
                 this->calendar.erase( this->calendar.begin() );
             }
-            
-            return true;
         }
+        
     }
     
-    return false;
+    return changedPlaces;
+}
+
+/**
+ * Odebrání události z kalendáře.
+ * @param event
+ */
+void Calendar::removeEvent( CalendarEvent *event ){
+    TTime time = this->eventMap[event];
+    this->eventMap.erase(event);
+    
+    TCalendar::iterator i = std::find_if( this->calendar.begin(), this->calendar.end(), [time](TCalendarItem const *item){
+        return item->first == time;
+    });
+    
+    TEventVector *events = (*i)->second;
+    TEventVector::iterator ii = std::find( events->begin(), events->end(), event );
+    delete *ii;
+    events->erase(ii);
+    
+    if( events->size() == 0 ){
+        delete events;
+        this->calendar.erase(i);
+    }
 }
         
 /**
@@ -92,4 +127,33 @@ bool Calendar::runEvent( TTime maxTime ){
  */
 const TTime * const Calendar::getCurrentTime(){
     return &this->currentTime;
+}
+
+/**
+ * Genenerátor exponenciálních čísel
+ * @param exp
+ * @return 
+ */
+double Calendar::getExp( double exp ){
+    return -exp * log( Calendar::getNorm() );
+}
+        
+/**
+ * Generátor náhodných čísel. 0.0 - 1.0
+ * @return 
+ */
+double Calendar::getNorm(){
+    return 1*(rand()/(RAND_MAX+1.0));
+}
+
+/**
+ * Calc time for transition.
+ * @param Transition transition
+ * @return double
+ */
+double Calendar::calcTime( Transition *transition ){
+    if( transition->getTimeType() == TTimeTypes::GeneratedTime)
+        return Calendar::getExp( transition->getTime() );
+    
+    return transition->getTime();
 }

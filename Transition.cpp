@@ -7,7 +7,6 @@
 
 #include "Transition.h"
 
-
 /**
  * Přechod založený na šanci.
  * @param chance
@@ -90,3 +89,15 @@ unsigned int Transition::getTime(){
 Transition::Type Transition::getType(){
     return this->type;
 } 
+
+/**
+ * Předání všech hran podle směru.
+ * @param direct
+ * @return 
+ */
+const TEdgeVector &Transition::getEdges( Edge::Direct direct ){
+    if( direct == Edge::PlaceTransition )
+        return this->placeTransitionEdges;
+    else
+        return this->transitionPlaceEdges;
+}

@@ -6,22 +6,18 @@
  */
 
 #include <vector>
+#include <algorithm>
 
 #include "Simulator.h"
 #include "Transition.h"
 #include "Place.h"
 #include "Edge.h"
-#include "Transaction.h"
 #include "Types.h"
 #include "Identificator.h"
 #include "Calendar.h"
-#include "TransactionProvider.h"
+#include "GeneratorEvent.h"
 
 Simulator::Simulator(){
-    this->transactionProvider = new TransactionProvider( 
-        &(this->transactions),
-        this->calendar.getCurrentTime()
-    );
 }
 
 /**
@@ -43,12 +39,6 @@ Simulator::~Simulator() {
         delete *i;
     }
     
-    //Dealokace transakcí
-    for(TTransactionVector::iterator i = this->transactions.begin(); i != this->transactions.end(); i++){
-        delete *i;
-    }
-    
-    delete this->transactionProvider;
 }
 
 /**
@@ -58,16 +48,9 @@ Simulator::~Simulator() {
  * @return 
  */
 Place *Simulator::createPlace( TCapacity initCapacity, TCapacity maxCapacity ){
-    Place *place = new Place(maxCapacity);
+    Place *place = new Place(initCapacity, maxCapacity);
     place->setId( this->places.size() );
-    this->places.push_back(place);
-    
-    //Vložení počátečních transakcí.
-    for( TCapacity i = 0; i < initCapacity; i++ ){
-        Transaction *transaction = this->transactionProvider->createTransaction(place);
-        place->transactions.push_back(transaction);
-    }
-    
+    this->places.push_back(place);    
     return place;
 }
         
@@ -109,7 +92,7 @@ Transition *Simulator::createTransition( TPriority priority ){
  * @return 
  */
 Transition *Simulator::storeTransition( Transition * transition){
-    transition->setId( this->transactions.size() );
+    transition->setId( this->transitions.size() );
     this->transitions.push_back(transition);
     return transition;
 }
@@ -119,7 +102,7 @@ Edge *Simulator::createEdge( Place *place, Transition *transition, TCapacity cap
     Edge *edge = new Edge( place, transition, capacity );
     
     place->placeTransitionEdges.push_back(edge);
-    transition->placeTransactionEdges.push_back(edge);
+    transition->placeTransitionEdges.push_back(edge);
     
     return this->storeEdge(edge);
 }
@@ -128,7 +111,7 @@ Edge *Simulator::createEdge( Transition *transition, Place *place, TCapacity cap
     Edge *edge = new Edge( transition, place, capacity );
     
     place->transitionPlaceEdges.push_back(edge);
-    transition->transactionPlaceEdges.push_back(edge);
+    transition->placeTransitionEdges.push_back(edge);
     
     return this->storeEdge(edge);
 }
@@ -148,7 +131,16 @@ Edge *Simulator::storeEdge( Edge *edge ){
  * Připravení modelu ke spuštění.
  */
 void Simulator::prepareModel(){
-    
+    //Nalezení přechodů které nemají vstupní hrany(generátorů).
+    for( TTransitionVector::iterator i = this->transitions.begin(); i != this->transitions.end(); i++ ){
+        Transition *transition = *(i);
+        const TEdgeVector edgeVector = transition->getEdges( Edge::TransitionPlace );
+        
+        if( edgeVector.size() == 0 ){
+            GeneratorEvent *event = new GeneratorEvent( &(this->calendar), transition);
+            this->calendar.addEvent(event, this->calendar.calcTime(transition));
+        }
+    }
 }
 
 /**
@@ -157,4 +149,128 @@ void Simulator::prepareModel(){
  */
 void Simulator::run( TTime maxTime ){
     this->prepareModel();
+    bool state = true;
+    
+    //Běh simulace.
+    do{
+        if( !(state = this->simPlaces( &(this->places) ))){
+            TPlaceVector *eventPlaces = calendar.runEvent(maxTime);
+            
+            if( state = (eventPlaces->size() > 0) ){
+                this->simPlaces( eventPlaces );
+            }
+        }
+    }while(state);
+}
+        
+/**
+ * Spuštění simulace na zadaná místa.
+ * @param places
+ * @return 
+ */
+bool Simulator::simPlaces( TPlaceVector *places ){
+    bool state = false;
+    std::for_each( places->begin(), places->end(), [&state, this](Place * const place){
+        state = state | this->simPlace(place);
+    } );
+    
+    return state;
+}
+
+/**
+ * Simulace přechodu z tohoto místa.
+ * @param place
+ * @return 
+ */
+bool Simulator::simPlace( Place *place ){
+    bool state = false;
+    
+    if( place->getCapacity() > 0 ){
+        const TEdgeVector &placeEdges = place->getEdges( Edge::PlaceTransition );
+        
+        //Zkopírování pouze proveditelných přechodů.
+        TEdgeVector usableEdges = TEdgeVector(placeEdges.size());
+        auto it = std::copy_if( placeEdges.begin(), placeEdges.end(), usableEdges.begin(), [place]( Edge * const edge ){
+            return place->getCapacity() >= edge->getCapacity();
+        } );
+        usableEdges.resize( std::distance(usableEdges.begin(), it) );
+        
+       //Seřadíme hrany podle priority přechodu.
+       std::vector<TPriorityVector> priorityMap;
+       std::for_each( usableEdges.begin(), usableEdges.end(), [&priorityMap]( Edge * const edge ){
+           TPriority priority = edge->getTransition()->getPriority();
+           
+           //Vyhledání priority ve vektoru.
+           auto it = std::find_if( priorityMap.begin(), priorityMap.end(), [priority]( const TPriorityVector &pair){
+               return pair.first == priority;
+           });
+           
+           //Vložení nové priority.
+           if( it == priorityMap.end() ){
+               it = priorityMap.end();
+               priorityMap.insert( it, std::make_pair(priority, TEdgeVector()) );
+           }
+           
+           //Přidání hrany.
+           (*it).second.push_back(edge);
+       });
+       std::stable_sort( priorityMap.rbegin(), priorityMap.rend() );
+       
+       //Spuštíme simulaci od nejvyší priority
+       std::all_of(priorityMap.begin(), priorityMap.end(), [&state, place, this]( TPriorityVector &pair ){
+           TEdgeVector &edgeVector = pair.second;
+           
+           //Spustění jednotlivých hran
+           std::all_of( edgeVector.begin(), edgeVector.end(), [&state, place, this]( Edge * edge ){
+               Transition *transition = edge->getTransition();
+               state = state | this->simTransition(transition);       
+               return place->getCapacity() > 0;
+           } );
+           
+           return place->getCapacity() > 0;
+       });
+    }
+    
+    return state;
+}
+
+/**
+ * Spuštění simulace přechodu.
+ * @param transition
+ * @return 
+ */
+bool Simulator::simTransition( Transition *transition ){
+    const TEdgeVector &inputEdges   = transition->getEdges(Edge::PlaceTransition);
+    const TEdgeVector &outputEdges  = transition->getEdges(Edge::TransitionPlace);
+    
+    //Kontrola jestly jsou hrany z míst proveditelné.
+    bool canTransfer = true;
+    std::all_of( inputEdges.begin(), inputEdges.end(), [&canTransfer]( Edge *edge ){
+        Place *place = edge->getPlace();
+        canTransfer = canTransfer & (place->getCapacity() >= edge->getCapacity());
+        return canTransfer;
+    });
+    
+    if( !canTransfer )
+        return false;
+    
+    //Kontrola kapacity míst za přechodem. 
+    std::all_of(outputEdges.begin(), outputEdges.end(), [&canTransfer]( Edge *edge ){
+        Place *place = edge->getPlace();
+        canTransfer = canTransfer & ( 
+            place->getMaxCapacity() == 0 || 
+            (edge->getCapacity() + place->getCapacity()) <= place->getMaxCapacity()
+        );
+            
+        return canTransfer;
+    });
+    
+    if( !canTransfer )
+        return false;
+    
+    //Provedení přechodu.
+    //if( transition )
+    // TODO: zde jsem zkončil.
+    
+    return true;
 }

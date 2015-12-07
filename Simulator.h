@@ -11,6 +11,7 @@
 #include "Types.h"
 #include "Calendar.h"
 #include "Transition.h"
+#include "Place.h"
 
 /**
  * Hlavní třída simulátoru.
@@ -42,6 +43,15 @@ class Simulator {
         //Přpravení modelu ke spuštění.
         void prepareModel();
         
+        /** Simulace přechodu z tohoto místa. */
+        bool simPlace( Place *place );
+        
+        /** Spuštění simulace na zadaná místa. */
+        bool simPlaces( TPlaceVector *places );
+        
+        /** Spuštění simulace přechodu. */
+        bool simTransition( Transition *transition );
+        
         //Pomocná metoda pro ukládání přechodů.
         Transition *storeTransition( Transition * transition);
         
@@ -50,13 +60,11 @@ class Simulator {
             
     private:
         Calendar calendar;
-        TransactionProvider *transactionProvider;
         
         //Uložiště všechy vytvořených objektů.
         TTransitionVector transitions;
         TPlaceVector places;
         TEdgeVector edges;
-        TTransactionVector transactions;
         
 };
 

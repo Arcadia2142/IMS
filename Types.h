@@ -20,9 +20,7 @@ class Identificator;
 class Calendar;
 class CalendarEvent;
 class Simulator;
-class TransactionProvider;
 class Place;
-class Transaction;
 class Transition;
 class Edge;
 
@@ -38,17 +36,17 @@ typedef enum{ UnTime, ConstantTime, GeneratedTime } TTimeTypes;
 /** Pole hran */
 typedef std::vector<Edge *> TEdgeVector;
 
-/** Pole transakcí */
-typedef std::vector<Transaction *> TTransactionVector;
-
 /** Time type in simulator. */
-typedef unsigned long int TTime;
+typedef double TTime;
 
 /** Statistický pár času s objektem přez který prochází. */
 typedef std::pair<TTime, Identificator *> TTimeIdentificatorPair;
 
 /** Vektor s časy. */
 typedef std::vector< TTimeIdentificatorPair > TTimeIdentificators;
+
+/** Pát priority s vektorem. */
+typedef std::pair<TPriority, TEdgeVector> TPriorityVector;
 
 //Pomocné typy vektorů
 typedef std::vector<Transition *> TTransitionVector;

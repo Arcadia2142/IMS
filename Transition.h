@@ -10,6 +10,7 @@
 
 #include "Types.h"
 #include "Identificator.h"
+#include "Edge.h"
 
 /**
  * Třída přechodu.
@@ -40,6 +41,9 @@ class Transition: public Identificator{
         /** Typ přechodu */
         Type getType();   
         
+        /** Předání všech hran podle směru.*/
+        const TEdgeVector &getEdges( Edge::Direct direct );
+        
     private:
         Transition( double chance );
         Transition( TTimeTypes timeType, TTime time, TPriority priority = 1 );
@@ -62,10 +66,10 @@ class Transition: public Identificator{
         Type type;
         
         /** Hrany z místa do přechodu. */
-        TEdgeVector placeTransactionEdges;
+        TEdgeVector placeTransitionEdges;
         
         /** Hrany z přechodu do místa. */
-        TEdgeVector transactionPlaceEdges;
+        TEdgeVector transitionPlaceEdges;
 };
 
 #endif /* TRANSITION_H */
