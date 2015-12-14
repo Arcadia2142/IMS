@@ -72,11 +72,10 @@ Transition *Simulator::createTransition( double chance ){
  * Vytvoření přechodu závyslého na čase.
  * @param timeType
  * @param time
- * @param priority
  * @return 
  */
-Transition *Simulator::createTransition( TTimeTypes timeType, TTime time, TPriority priority ){
-    Transition *transition = new Transition(timeType, time, priority);
+Transition *Simulator::createTransition( TTimeTypes timeType, TTime time ){
+    Transition *transition = new Transition(timeType, time);
     return this->storeTransition(transition);
 }
 
@@ -138,7 +137,7 @@ void Simulator::prepareModel(){
     //Nalezení přechodů které nemají vstupní hrany(generátorů).
     for( TTransitionVector::iterator i = this->transitions.begin(); i != this->transitions.end(); i++ ){
         Transition *transition = *(i);
-        const TEdgeVector edgeVector = transition->getEdges( Edge::TransitionPlace );
+        const TEdgeVector edgeVector = transition->getEdges( Edge::PlaceTransition );
         
         if( edgeVector.size() == 0 ){
             GeneratorEvent *event = new GeneratorEvent( &(this->calendar), transition);
@@ -404,21 +403,12 @@ bool Simulator::isChanceTransitions( const TEdgeVector &edges ){
     bool state = std::all_of( edges.begin(), edges.end(), [&chance]( Edge *edge ){
         Transition *transition = edge->getTransition();
         if( transition->getType() == Transition::ChanceTransition ){
-            chance = chance + transition->getChance();
-            
-            if( chance > 1.0){
-                //TODO chybné procenta.
-            }
-            
+            chance = chance + transition->getChance();            
             return true;
         }
         
         return false;
     });
-    
-    if( chance > 0.0 && !state ){
-        //TODO míchání šance s dalšími přechody.
-    }
     
     return state;
 }

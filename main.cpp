@@ -26,7 +26,11 @@ using namespace std;
 
 //Prototyp simulace
 void cowSimulation( Simulator *simulator );
+void towSimulation( Simulator *simulator );
 void printHelp();
+
+//Modely na výběr.
+typedef enum EModels{cowModel = 1,towModel = 2} TModels;
 
 /*
  * 
@@ -34,6 +38,7 @@ void printHelp();
 int main(int argc, char** argv) {   
     TTime simTime = DEFAULT_MAX_SIMULATION_TIME;
     unsigned int statistics = StatisticPrinter::All;
+    TModels model = TModels::cowModel;
     
     //Zpracování argumentů.
     char modificator = '\0';
@@ -59,6 +64,11 @@ int main(int argc, char** argv) {
             }else if( mod == 's' ){
                 statistics = atoi(argv[i]);
                 continue;
+            }else if( mod == 'm' ){
+                if(string(argv[i]).compare("tow") == 0){
+                    model = TModels::towModel;
+                }
+                continue;
             }
         }
         
@@ -70,7 +80,11 @@ int main(int argc, char** argv) {
     Simulator *simulator = new Simulator();
     
     //Loadování simulačního modelu.
-    cowSimulation(simulator);
+    if( model == TModels::towModel ){
+        towSimulation(simulator);
+    }else{
+        cowSimulation(simulator);
+    }
     
     simulator->run(simTime);
     simulator->printStatistics( statistics );
@@ -88,6 +102,7 @@ void printHelp(){
     cout << "Dostupné parametry:" << endl;
     cout << " -t 1000    - Nastaví maximální čas simulace na 1000." << endl;
     cout << " -s 4       - Zobrazí informace o místech v modelu." << endl;
+    cout << " -m tow     - Spustí simulační model vleku" << endl;
     cout << "Parametr s je součet čísel informací které hledáte( princip bitového pole)" << endl;
     cout << "Zobrazitelné informace:" << endl;
     cout << "0 - Nezobrazovat nic" << endl;
@@ -101,6 +116,7 @@ void printHelp(){
     cout << "Za čas simulace 1000:" << endl;
     cout << "./simulator -t 1000 -p 29" << endl;
 }
+
 
 /**
 * Simulace "Krava / Dojička / auto"
@@ -258,3 +274,89 @@ void cowSimulation( Simulator *simulator ){
     simulator->createEdge(t12, onRamp);
 };
 
+/**
+ * Simulace "tow"
+ * @param simulator
+ */
+void towSimulation( Simulator *simulator ){
+    
+    //Místa
+    Place *p0 = simulator->createPlace();
+    
+    Place *p1 = simulator->createPlace();
+    
+    Place *p2 = simulator->createPlace(1);
+    p2->setDescription("Stanoviste");
+    
+    Place *p3 = simulator->createPlace();
+    
+    Place *p4 = simulator->createPlace(40);
+    p4->setDescription("Kotvy");
+    
+    Place *p5 = simulator->createPlace();
+    
+    Place *p6 = simulator->createPlace();
+    
+    Place *p7 = simulator->createPlace();
+    
+    Place *p8 = simulator->createPlace();
+    
+    Place *p9 = simulator->createPlace();
+    
+    //Přechody    
+    Transition *t0 = simulator->createTransition( TTimeTypes::GeneratedTime, 1 );
+    t0->setDescription("Exp((1)");
+    simulator->createEdge(t0, p0);
+    
+    Transition *t1 = simulator->createTransition( TTimeTypes::GeneratedTime, 10 );
+    t1->setDescription("Exp((10)");
+    simulator->createEdge(t1, p1, 2);
+    
+    Transition *t2 = simulator->createTransition();
+    simulator->createEdge(p0, t2);
+    simulator->createEdge(p2, t2);
+    simulator->createEdge(t2, p3);
+    
+    Transition *t3 = simulator->createTransition((TPriority) 1);
+    t3->setDescription("Pri 1");
+    simulator->createEdge(p1, t3);
+    simulator->createEdge(p2, t3);
+    simulator->createEdge(t3, p3);
+    
+    Transition *t4 = simulator->createTransition();
+    simulator->createEdge(p3, t4);
+    simulator->createEdge(p4, t4);
+    simulator->createEdge(t4, p5);
+    
+    Transition *t5 = simulator->createTransition( TTimeTypes::ConstantTime, 4 );
+    simulator->createEdge(p6, t5);
+    simulator->createEdge(t5, p4);
+    
+    Transition *t6 = simulator->createTransition(0.1);
+    t6->setDescription("10%");
+    simulator->createEdge(p5, t6);
+    simulator->createEdge(t6, p3);
+    simulator->createEdge(t6, p7);
+    
+    Transition *t7 = simulator->createTransition(0.9);
+    t7->setDescription("90%");
+    simulator->createEdge(p5, t7);
+    simulator->createEdge(t7, p8);
+    simulator->createEdge(t7, p2);
+    
+    Transition *t8 = simulator->createTransition( TTimeTypes::ConstantTime, 4 );
+    t8->setDescription("10% (4)");
+    simulator->createEdge(p7, t8);
+    simulator->createEdge(t8, p6);
+    
+    Transition *t9 = simulator->createTransition(TTimeTypes::ConstantTime, 4);
+    t9->setDescription("90% (4)");
+    simulator->createEdge(p8, t9);
+    simulator->createEdge(t9, p6);
+    simulator->createEdge(t9, p9);
+    
+    Transition *t10 = simulator->createTransition();
+    t10->setDescription("Výstup");
+    simulator->createEdge(p9, t10);
+
+}

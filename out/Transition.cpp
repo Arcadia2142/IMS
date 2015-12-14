@@ -23,10 +23,9 @@ Transition::Transition( double chance ){
  * @param time
  * @param priority
  */
-Transition::Transition( TTimeTypes timeType, TTime time, TPriority priority ){
+Transition::Transition( TTimeTypes timeType, TTime time ){
     this->timeType  = timeType;
     this->time      = time;
-    this->priority  = priority;
     this->type      = Transition::TimeTransition;
 }
 

@@ -30,7 +30,7 @@ class Simulator {
         
         //Vytvoření přechodu.
         Transition *createTransition( double chance );
-        Transition *createTransition( TTimeTypes timeType, TTime time, TPriority priority = 0 );
+        Transition *createTransition( TTimeTypes timeType, TTime time );
         Transition *createTransition( TPriority priority = 0 );
         
         //Vytvoření hrany.

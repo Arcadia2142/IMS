@@ -41,7 +41,7 @@ TPlaceVector *GeneratorEvent::run(){
         
         //Nastavení kapacity místa.
         if( (place->getCapacity() + edge->getCapacity()) <= place->getMaxCapacity() || place->getMaxCapacity() == 0 ){
-            place->setCapacity( place->getCapacity() + edge->getCapacity() );
+            place->addCapacity( edge->getCapacity() );
             changedPlaces->push_back(place);
         }
     }

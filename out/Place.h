@@ -22,6 +22,7 @@ typedef std::vector< CalendarEvent * > TCapacityFront;
  */
 class Place: public Identificator{
     friend class Simulator;
+    friend class GeneratorEvent;
     
     public:        
         /** Název objektu */
